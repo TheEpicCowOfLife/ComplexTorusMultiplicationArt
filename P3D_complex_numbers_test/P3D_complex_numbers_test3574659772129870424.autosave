@@ -1,0 +1,117 @@
+float lx1;
+float ly1;
+float lz1;
+float lx2;
+float ly2;
+float lz2;
+//number of points that will be represented
+int num_a = 11;
+int num_b = 11;
+
+// point (a + bi) will be connected to point (a + bi)(c + di)
+int c = 1; 
+int d = 1; 
+
+int aindex;
+int bindex; 
+//sP stands for spherePoints, the lookup table for the location of all the points on
+//the sphere.
+float[][][] sP;
+
+
+float abRatio;
+int time = 0;
+
+
+void setup() {
+  //  size(1000, 1000, P3D);
+  fullScreen(P3D);
+  translateX = width/2;
+  translateY = height/2;
+  background(0);
+  stroke(255, 255, 255);
+  strokeWeight(5);
+
+  sP = new float[200][200][3];
+  updatesP(num_a, num_b);
+
+  colorMode(HSB, 100, 100, 100, 100);
+  //ortho();
+}
+
+void updatesP(int num_a, int num_b) {
+
+  float sina;
+  float cosa;
+  float sinb;
+  float cosb;
+
+  for (float a  = 0; a < num_a; a++) {
+    sina = sin(map(a, 0, num_a, 0, TAU));
+    cosa = cos(map(a, 0, num_a, 0, TAU));
+    for (float b  = 0; b < num_b; b++) {
+      sinb = sin(map(b, 0, num_b, 0, TAU));
+      cosb = cos(map(b, 0, num_b, 0, TAU));
+
+      sP[int(a)][int(b)][0] = 500*sina*cosb; //x coord
+      sP[int(a)][int(b)][1] = -500*sinb;  // y coord
+      sP[int(a)][int(b)][2] = 500*cosa *cosb; // z coord 
+   //   println(str(sP[int(a)][int(b)][0]) + "," + sP[int(a)][int(b)][1]+
+    }
+  }
+}
+
+void draw() {
+  clear();
+
+  pushMatrix();
+  applyTransformations();
+  strokeWeight(5);
+  stroke(0, 0, 255);
+  for (int a = 0; a < num_a; a++) {
+    for (int b = 0; b < num_b; b++) {
+      //stroke(50*(float(a)/float(num_a)) + 50*(float(b)/float(num_a)),255,255);
+      point(sP[a][b][0], sP[a][b][1], sP[a][b][2]);
+    }
+  }
+  strokeWeight(1);
+  for (int a = 0; a < num_a; a++) {
+
+
+    for (int b = 0; b < num_b; b++) {
+      abRatio = 50*(float(a)/float(num_a)) + 50*(float(b)/float(num_b));
+      //if (0  < (abRatio+time)%100  && 20  > (abRatio+time)%100) {
+      if (true){
+        aindex = (a * c - b * d) % num_a;
+        if (aindex < 0) {
+          aindex = num_a + aindex;
+        }
+
+        bindex = (a * d + b * c) % num_b;
+        if (bindex < 0) {
+          bindex = num_b + bindex;
+        }
+
+        lx1 = sP[a][b][0];
+        ly1 = sP[a][b][1];
+        lz1 = sP[a][b][2];
+
+        lx2 = sP[aindex][bindex][0];
+        ly2 = sP[aindex][bindex][1];
+        lz2 = sP[aindex][bindex][2];
+
+        stroke(abRatio, 100, 100, 50);
+        line(lx1, ly1, lz1, lx2, ly2, lz2);
+      }
+      if (pointText){
+      text("("+str(a) + ", " + str(b) + ")",lx1,ly1,lz1);
+      }
+    }
+  }
+  popMatrix();
+
+  text("c: " + str(c), 0, 10);
+  text("d: " + str(d), 0, 20);
+
+  time++;
+}

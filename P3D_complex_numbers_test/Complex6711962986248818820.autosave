@@ -1,0 +1,20 @@
+boolean pointText = false;
+
+void keyPressed() {
+
+  if (key == 'a') {
+    c ++;
+  }
+  if (key == 's') {
+    c --;
+  }
+  if (key == 'z') {
+    d ++;
+  }
+  if (key == 'x') {
+    d --;
+  }
+  if (key == 'q') {
+    pointText = !pointText;
+  }
+}
